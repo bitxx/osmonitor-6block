@@ -7,16 +7,16 @@
 1. 由客户端(client)和服务端(server)两部分组成，客户端在各个worker机上，用来上报异常，服务端用来接收异常并发送邮件
 2. 服务端负责接收各台worker机器的异常上报，若接收到异常上报，则定时发送邮件给用户。邮件发送时间由用户自行设置，我一般30分钟接收一次
 3. 主要上报异常说明
-   1. worker进程监控，因各种原因崩溃或者丢失，都会发送给服务端，然后邮件告诉你，有worker机的程序崩了
-   2. 主要是监控worker进程没崩，但算力归零时的情况，也就是有卡显示算力为`N/A`的问题。我主要是读取`journalctl`最近1分钟的日志，每分钟读一次，连续读5分钟，如果都出现`N/A`标记，则上报异常给服务端
+   1. worker进程监控，因各种原因崩溃或者丢失，都会发送给服务端，然后邮件告诉你，有worker机的程序崩了，赶紧去处理
+   2. 主要是监控worker进程没崩，但算力归零时的情况，也就是有卡显示算力为`N/A`的问题。我主要是读取`journalctl`最近1分钟的日志，每分钟读一次，连续读5分钟，如果都出现`1m - N/A`标记，则上报异常给服务端。
+   3. 比如你的`systemctl`进程名是`6block-miner`，则如果邮件提示里显示类似`2024-09-14 08:22:50 => node: [myworker-192.168.1.2:51078] these processes are stopped: 6block-miner`，则表示进程掉线，如果最后面显示的是`6block-miner-NA`，则是`N/A`异常
 4. `需要再次解释`，服务端邮箱不是收到异常上报就立马发送邮件，而是根据你设置的间隔时间，统一发送。先汇总，后发送 
+5. `需要注意`：worker设备，必须使用service方式部署锄头，也就是要支持`systemctl`启动停止锄头，`journalctl`查阅程序日志
 
 ## 针对6block的使用
-功能介绍、编译等细节请参考[osmonitor](https://github.com/bitxx/osmonitor) 里面的介绍，这里只针对6block的使用进行`最简步骤说明`
-这里直接从[release](https://github.com/bitxx/osmonitor-6block/releases)下载程序进行操作，我只编译了linux-amd64的。不放心的或者想用别的平台，可以自行查阅代码并编译，本开源项目不对任何风险负责。  
-
-## 注意
-worker设备，必须使用service方式部署，也就是要支持`systemctl`启动停止锄头，`journalctl`查阅程序日志
+1. 功能介绍、编译等细节请参考[osmonitor](https://github.com/bitxx/osmonitor) 里面的介绍，这里只针对6block的使用进行`最简步骤说明`
+2. 这里直接从[release](https://github.com/bitxx/osmonitor-6block/releases)下载程序进行操作，我只编译了linux-amd64的。不放心的或者想用别的平台，可以自行查阅代码并编译，本开源项目不对任何风险负责。
+3. ubuntu22.04验证通过
 
 ### client 客户端
 ```shell

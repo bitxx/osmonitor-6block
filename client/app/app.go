@@ -245,11 +245,11 @@ func (a *App) reportErrProc(conn *connutil.ConnWrapper) error {
 	}
 
 	// 连续5分钟检测到N/A
-	result, _ := cmdutil.RunCmd("journalctl -n 20 -u " + a.procNames[0] + "+(N/A) -g gpu --since \"1 minutes ago\"")
+	result, _ := cmdutil.RunCmd("journalctl -n 20 -u " + a.procNames[0] + " -g gpu --since \"1 minutes ago\"")
 	if strings.Contains(result, "1m - N/A") {
 		a.Err6block++
 		if a.Err6block > 5 {
-			errProcs += "aleo-miner-6block"
+			errProcs += "aleo-miner-6block-NA"
 			a.Err6block = 0
 		}
 	} else {
