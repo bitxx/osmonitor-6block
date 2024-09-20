@@ -251,6 +251,8 @@ func (a *App) reportErrProc(conn *connutil.ConnWrapper) error {
 		if a.Err6block > 5 {
 			errProcs += "aleo-miner-6block-NA"
 			a.Err6block = 0
+
+			_, _ = cmdutil.RunCmd("systemctl stop " + a.procNames[0] + " && sleep 1 && systemctl start " + a.procNames[0])
 		}
 	} else {
 		a.Err6block = 0
